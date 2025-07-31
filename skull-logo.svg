@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Skull outline -->
+  <path d="M32 8C21 8 12 17 12 28C12 34.6 15.4 40.5 20.7 44.2L18 56H46L43.3 44.2C48.6 40.5 52 34.6 52 28C52 17 43 8 32 8Z" fill="#E8E8E8" stroke="#333" stroke-width="2"/>
+  
+  <!-- Eye sockets -->
+  <circle cx="24" cy="26" r="4" fill="#333"/>
+  <circle cx="40" cy="26" r="4" fill="#333"/>
+  
+  <!-- Nasal cavity -->
+  <path d="M30 34L32 38L34 34V30H30V34Z" fill="#333"/>
+  
+  <!-- Teeth -->
+  <rect x="28" y="40" width="2" height="6" fill="#333"/>
+  <rect x="32" y="40" width="2" height="6" fill="#333"/>
+  <rect x="36" y="40" width="2" height="6" fill="#333"/>
+  
+  <!-- Jaw line -->
+  <path d="M20 44C20 44 24 48 32 48C40 48 44 44 44 44" stroke="#333" stroke-width="2" fill="none"/>
+</svg>
