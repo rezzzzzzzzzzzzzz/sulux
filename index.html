@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TeleClipper - Dark Web Clipper</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 4C10.48 4 6 8.48 6 14C6 17.31 7.69 20.24 10.34 22.11L9 28H23L21.66 22.11C24.31 20.24 26 17.31 26 14C26 8.48 21.52 4 16 4Z' fill='%23ff6b6b'/><circle cx='12' cy='13' r='2' fill='%23000'/><circle cx='20' cy='13' r='2' fill='%23000'/><path d='M14 18H18V20H14V18Z' fill='%23000'/></svg>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+    
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    @keyframes glow{0%{box-shadow:0 0 5px #ff6b6b}50%{box-shadow:0 0 20px #ff6b6b, 0 0 30px #ff6b6b}100%{box-shadow:0 0 5px #ff6b6b}}
+    @keyframes skullFloat{0%{transform:translateY(0px)}50%{transform:translateY(-10px)}100%{transform:translateY(0px)}}
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Orbitron', monospace;
+      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 50%, #0c0c0c 100%);
+      min-height: 100vh;
+      color: #e0e0e0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    /* Animated background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 80%, rgba(255, 107, 107, 0.05) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeIn 1s ease-out;
+    }
+    
+    .skull-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      animation: skullFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.5));
+    }
+    
+    .title {
+      font-size: 2.5em;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff6b6b, #ffa500, #ff6b6b);
+      background-size: 200% 200%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradient 3s ease infinite;
+      margin-bottom: 10px;
+      text-shadow: 0 0 30px rgba(255, 107, 107, 0.5);
+    }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .subtitle {
+      font-size: 1em;
+      color: #888;
+      font-weight: 400;
+    }
+    
+    #clipper-form {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 107, 107, 0.2);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: fadeIn 1s ease-out 0.3s both;
+    }
+    
+    .input-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+      color: #ff6b6b;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    input[type="url"],
+    input[type="file"],
+    textarea {
+      width: 100%;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 107, 107, 0.3);
+      border-radius: 10px;
+      color: #e0e0e0;
+      font-family: 'Orbitron', monospace;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    
+    input[type="url"]:focus,
+    input[type="file"]:focus,
+    textarea:focus {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    input.invalid {
+      border-color: #ff4757;
+      animation: glow 2s infinite;
+    }
+    
+    input.valid {
+      border-color: #2ed573;
+      box-shadow: 0 0 10px rgba(46, 213, 115, 0.4);
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .form-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+      align-items: center;
+    }
+    
+    button {
+      background: linear-gradient(45deg, #ff6b6b, #ffa500);
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      flex: 1;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    button:hover::before {
+      left: 100%;
+    }
+    
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+    }
+    
+    button.secondary {
+      background: linear-gradient(45deg, #666, #888);
+    }
+    
+    button.secondary:hover {
+      box-shadow: 0 10px 25px rgba(136, 136, 136, 0.4);
+    }
+    
+    button:disabled {
+      background: #444;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .loading-spinner {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 107, 107, 0.3);
+      border-radius: 50%;
+      border-top-color: #ff6b6b;
+      animation: spin 1s linear infinite;
+      margin: 0 15px;
+    }
+    
+    #status-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .success {
+      background: rgba(46, 213, 115, 0.2);
+      color: #2ed573;
+      border: 1px solid #2ed573;
+    }
+    
+    .error {
+      background: rgba(255, 71, 87, 0.2);
+      color: #ff4757;
+      border: 1px solid #ff4757;
+    }
+    
+    .info {
+      background: rgba(255, 107, 107, 0.2);
+      color: #ff6b6b;
+      border: 1px solid #ff6b6b;
+    }
+    
+    .url-feedback {
+      font-size: 12px;
+      margin-top: 5px;
+      min-height: 16px;
+      font-weight: 600;
+    }
+    
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .title {
+        font-size: 2em;
+      }
+      
+      #clipper-form {
+        padding: 20px;
+      }
+      
+      .form-buttons {
+        flex-direction: column;
+      }
+      
+      button {
+        padding: 12px 20px;
+      }
+    }
+    
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #1a1a1a;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #ff6b6b;
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ffa500;
+    }
+    
+    /* Password Protection Styles */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .password-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: fadeIn 0.8s ease-out 0.2s both;
+    }
+    
+    .password-header {
+      margin-bottom: 30px;
+    }
+    
+    .password-header .skull-logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 20px;
+      animation: skullFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.6));
+    }
+    
+    .password-title {
+      font-size: 1.8em;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff6b6b, #ffa500, #ff6b6b);
+      background-size: 200% 200%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradient 3s ease infinite;
+      margin-bottom: 10px;
+    }
+    
+    .password-subtitle {
+      color: #888;
+      font-size: 0.9em;
+      font-weight: 400;
+    }
+    
+    .password-form {
+      width: 100%;
+    }
+    
+    .password-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    #password-input {
+      flex: 1;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 107, 107, 0.3);
+      border-radius: 10px;
+      color: #e0e0e0;
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    
+    #password-input:focus {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    #password-input.error {
+      border-color: #ff4757;
+      animation: glow 1s;
+    }
+    
+    #password-submit {
+      background: linear-gradient(45deg, #ff6b6b, #ffa500);
+      color: white;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    
+    #password-submit::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    #password-submit:hover::before {
+      left: 100%;
+    }
+    
+    #password-submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+    }
+    
+    .password-error {
+      color: #ff4757;
+      font-size: 0.8em;
+      font-weight: 600;
+      min-height: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .password-overlay.hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Password Protection Overlay -->
+  <div id="password-overlay" class="password-overlay">
+    <div class="password-container">
+      <div class="password-header">
+        <div class="skull-logo">
+          <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8C21 8 12 17 12 28C12 34.6 15.4 40.5 20.7 44.2L18 56H46L43.3 44.2C48.6 40.5 52 34.6 52 28C52 17 43 8 32 8Z" fill="#E8E8E8" stroke="#ff6b6b" stroke-width="2"/>
+            <circle cx="24" cy="26" r="4" fill="#333"/>
+            <circle cx="40" cy="26" r="4" fill="#333"/>
+            <path d="M30 34L32 38L34 34V30H30V34Z" fill="#333"/>
+            <rect x="28" y="40" width="2" height="6" fill="#333"/>
+            <rect x="32" y="40" width="2" height="6" fill="#333"/>
+            <rect x="36" y="40" width="2" height="6" fill="#333"/>
+            <path d="M20 44C20 44 24 48 32 48C40 48 44 44 44 44" stroke="#333" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+        <h2 class="password-title">🔒 Access Required</h2>
+        <p class="password-subtitle">Enter password to continue</p>
+      </div>
+      
+      <form id="password-form" class="password-form">
+        <div class="password-input-group">
+          <input type="password" id="password-input" placeholder="Enter password" maxlength="50" autocomplete="off">
+          <button type="submit" id="password-submit">💀 Unlock</button>
+        </div>
+        <div id="password-error" class="password-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <div class="skull-logo">
+        <svg width="80" height="80" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Skull outline -->
+          <path d="M32 8C21 8 12 17 12 28C12 34.6 15.4 40.5 20.7 44.2L18 56H46L43.3 44.2C48.6 40.5 52 34.6 52 28C52 17 43 8 32 8Z" fill="#E8E8E8" stroke="#ff6b6b" stroke-width="2"/>
+          
+          <!-- Eye sockets -->
+          <circle cx="24" cy="26" r="4" fill="#333"/>
+          <circle cx="40" cy="26" r="4" fill="#333"/>
+          
+          <!-- Nasal cavity -->
+          <path d="M30 34L32 38L34 34V30H30V34Z" fill="#333"/>
+          
+          <!-- Teeth -->
+          <rect x="28" y="40" width="2" height="6" fill="#333"/>
+          <rect x="32" y="40" width="2" height="6" fill="#333"/>
+          <rect x="36" y="40" width="2" height="6" fill="#333"/>
+          
+          <!-- Jaw line -->
+          <path d="M20 44C20 44 24 48 32 48C40 48 44 44 44 44" stroke="#333" stroke-width="2" fill="none"/>
+        </svg>
+      </div>
+      <h1 class="title">TeleClipper</h1>
+      <p class="subtitle">Dark Web Content Clipper</p>
+    </div>
+    
+    <form id="clipper-form" novalidate aria-label="Send content to Telegram">
+      <div class="input-group">
+        <label for="url-input">🔗 URL</label>
+        <input type="url" id="url-input" name="url" placeholder="https://example.com" aria-label="Enter a URL">
+        <div id="url-feedback" class="url-feedback" role="alert" aria-live="polite"></div>
+      </div>
+      
+      <div class="input-group">
+        <label for="note-input">📝 Note</label>
+        <textarea id="note-input" name="note" rows="4" maxlength="2000" placeholder="Add your thoughts..." aria-label="Enter a note"></textarea>
+      </div>
+      
+      <div class="input-group">
+        <label for="file-input">📁 File</label>
+        <input type="file" id="file-input" name="file" aria-label="Upload a file">
+      </div>
+      
+      <div class="form-buttons">
+        <button type="submit" id="submit-button" tabindex="0">💀 Send to Telegram</button>
+        <div class="loading-spinner"></div>
+        <button type="button" id="reset-button" class="secondary" tabindex="0">🗑️ Clear Form</button>
+      </div>
+    </form>
+    
+    <div id="status-message" role="alert" aria-live="polite"></div>
+  </div>
+  <script defer src="js/script.js"></script>
+</body>
+</html>
