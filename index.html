@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TeleClipper</title>
+  <style>
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}body{font-family:sans-serif}#clipper-form{max-width:500px;margin:0 auto;padding:20px}label{display:block;margin-bottom:5px}input[type="url"],input[type="file"],textarea{width:100%;margin-bottom:15px;padding:8px;box-sizing:border-box}input.invalid{border:2px solid #ff6b6b}input.valid{border:2px solid #51cf66}.form-buttons{display:flex;gap:10px;margin-top:10px}button{background-color:#007bff;color:white;padding:10px 20px;border:none;cursor:pointer;flex:1}button.secondary{background-color:#6c757d}button:hover{opacity:0.9}button:disabled{background-color:#6c757d;cursor:not-allowed}#status-message{margin-top:10px;font-size:16px;animation:fadeIn 0.5s ease-in-out}.success{color:green}.error{color:red}.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid #ffffff;border-radius:50%;border-top-color:transparent;animation:spin 1s ease-in-out infinite;margin-right:8px}.url-feedback{font-size:12px;margin-top:-10px;margin-bottom:10px;min-height:16px}
+  </style>
+</head>
+<body>
+  <form id="clipper-form" novalidate aria-label="Send content to Telegram">
+    <label for="url-input">URL:</label>
+    <input type="url" id="url-input" name="url" aria-label="Enter a URL">
+    <div id="url-feedback" class="url-feedback" role="alert" aria-live="polite"></div>
+    <br>
+    <label for="note-input">Note:</label>
+    <textarea id="note-input" name="note" rows="4" maxlength="2000" aria-label="Enter a note"></textarea>
+    <br>
+    <label for="file-input">File:</label>
+    <input type="file" id="file-input" name="file" aria-label="Upload a file">
+    <br>
+    <div class="form-buttons">
+      <button type="submit" id="submit-button" tabindex="0">Send to Telegram</button>
+      <button type="button" id="reset-button" class="secondary" tabindex="0">Clear Form</button>
+    </div>
+  </form>
+  <div id="status-message" role="alert" aria-live="polite"></div>
+  <script defer src="js/script.js"></script>
+</body>
+</html>
