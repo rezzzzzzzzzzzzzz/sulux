@@ -309,9 +309,186 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #ffa500;
     }
+    
+    /* Password Protection Styles */
+    .password-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .password-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: fadeIn 0.8s ease-out 0.2s both;
+    }
+    
+    .password-header {
+      margin-bottom: 30px;
+    }
+    
+    .password-header .skull-logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 20px;
+      animation: skullFloat 3s ease-in-out infinite;
+      filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.6));
+    }
+    
+    .password-title {
+      font-size: 1.8em;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff6b6b, #ffa500, #ff6b6b);
+      background-size: 200% 200%;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: gradient 3s ease infinite;
+      margin-bottom: 10px;
+    }
+    
+    .password-subtitle {
+      color: #888;
+      font-size: 0.9em;
+      font-weight: 400;
+    }
+    
+    .password-form {
+      width: 100%;
+    }
+    
+    .password-input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    #password-input {
+      flex: 1;
+      padding: 15px 20px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 107, 107, 0.3);
+      border-radius: 10px;
+      color: #e0e0e0;
+      font-family: 'Orbitron', monospace;
+      font-size: 16px;
+      text-align: center;
+      letter-spacing: 2px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    
+    #password-input:focus {
+      border-color: #ff6b6b;
+      box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+      transform: translateY(-2px);
+    }
+    
+    #password-input.error {
+      border-color: #ff4757;
+      animation: glow 1s;
+    }
+    
+    #password-submit {
+      background: linear-gradient(45deg, #ff6b6b, #ffa500);
+      color: white;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    
+    #password-submit::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    #password-submit:hover::before {
+      left: 100%;
+    }
+    
+    #password-submit:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+    }
+    
+    .password-error {
+      color: #ff4757;
+      font-size: 0.8em;
+      font-weight: 600;
+      min-height: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .password-overlay.hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
+  <!-- Password Protection Overlay -->
+  <div id="password-overlay" class="password-overlay">
+    <div class="password-container">
+      <div class="password-header">
+        <div class="skull-logo">
+          <svg width="60" height="60" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M32 8C21 8 12 17 12 28C12 34.6 15.4 40.5 20.7 44.2L18 56H46L43.3 44.2C48.6 40.5 52 34.6 52 28C52 17 43 8 32 8Z" fill="#E8E8E8" stroke="#ff6b6b" stroke-width="2"/>
+            <circle cx="24" cy="26" r="4" fill="#333"/>
+            <circle cx="40" cy="26" r="4" fill="#333"/>
+            <path d="M30 34L32 38L34 34V30H30V34Z" fill="#333"/>
+            <rect x="28" y="40" width="2" height="6" fill="#333"/>
+            <rect x="32" y="40" width="2" height="6" fill="#333"/>
+            <rect x="36" y="40" width="2" height="6" fill="#333"/>
+            <path d="M20 44C20 44 24 48 32 48C40 48 44 44 44 44" stroke="#333" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+        <h2 class="password-title">🔒 Access Required</h2>
+        <p class="password-subtitle">Enter password to continue</p>
+      </div>
+      
+      <form id="password-form" class="password-form">
+        <div class="password-input-group">
+          <input type="password" id="password-input" placeholder="Enter password" maxlength="50" autocomplete="off">
+          <button type="submit" id="password-submit">💀 Unlock</button>
+        </div>
+        <div id="password-error" class="password-error"></div>
+      </form>
+    </div>
+  </div>
+
   <div class="container">
     <div class="header">
       <div class="skull-logo">

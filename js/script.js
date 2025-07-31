@@ -1,3 +1,118 @@
+// Password protection configuration
+let userPassword = ''; // Store password in memory after authentication
+
+// Password protection elements
+const passwordOverlay = document.getElementById('password-overlay');
+const passwordForm = document.getElementById('password-form');
+const passwordInput = document.getElementById('password-input');
+const passwordSubmit = document.getElementById('password-submit');
+const passwordError = document.getElementById('password-error');
+
+// Check if user is already authenticated
+function checkAuthentication() {
+  const isAuthenticated = sessionStorage.getItem('teleClipperAuth') === 'true';
+  const storedPassword = sessionStorage.getItem('teleClipperPassword');
+  if (isAuthenticated && storedPassword) {
+    userPassword = storedPassword;
+    passwordOverlay.classList.add('hidden');
+  }
+}
+
+// Handle password form submission
+passwordForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  
+  const enteredPassword = passwordInput.value.trim();
+  
+  if (!enteredPassword) {
+    passwordError.textContent = '❌ Please enter a password.';
+    passwordInput.focus();
+    return;
+  }
+  
+  // Show loading state
+  passwordSubmit.disabled = true;
+  passwordSubmit.textContent = '🔄 Verifying...';
+  
+  try {
+    // Test password by making a dummy request to the backend
+    const testFormData = new FormData();
+    testFormData.append('password', enteredPassword);
+    testFormData.append('note', 'auth_test'); // Minimal test data
+    
+    const response = await fetch('https://tele-clipper-worker.poxmaadani.workers.dev', {
+      method: 'POST',
+      body: testFormData
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok && result.success) {
+      // Correct password
+      userPassword = enteredPassword;
+      sessionStorage.setItem('teleClipperAuth', 'true');
+      sessionStorage.setItem('teleClipperPassword', enteredPassword);
+      
+      passwordOverlay.style.animation = 'fadeOut 0.5s ease-out forwards';
+      
+      setTimeout(() => {
+        passwordOverlay.classList.add('hidden');
+      }, 500);
+      
+      passwordError.textContent = '';
+      passwordInput.classList.remove('error');
+    } else {
+      // Wrong password
+      passwordError.textContent = '❌ Incorrect password. Try again.';
+      passwordInput.classList.add('error');
+      passwordInput.value = '';
+      passwordInput.focus();
+      
+      // Remove error styling after 2 seconds
+      setTimeout(() => {
+        passwordInput.classList.remove('error');
+        passwordError.textContent = '';
+      }, 2000);
+    }
+  } catch (error) {
+    console.error('Password verification error:', error);
+    passwordError.textContent = '❌ Network error. Please try again.';
+    passwordInput.classList.add('error');
+  }
+  
+  // Reset button state
+  passwordSubmit.disabled = false;
+  passwordSubmit.textContent = '💀 Unlock';
+});
+
+// Focus password input when overlay is shown
+passwordInput.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    passwordForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }
+});
+
+// Add fadeOut animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+  }
+`;
+document.head.appendChild(style);
+
+// Initialize authentication check
+checkAuthentication();
+
+// Focus password input initially
+setTimeout(() => {
+  if (!passwordOverlay.classList.contains('hidden')) {
+    passwordInput.focus();
+  }
+}, 500);
+
 // Get references to form elements
 const form = document.getElementById('clipper-form');
 const submitButton = document.getElementById('submit-button');
@@ -114,6 +229,18 @@ form.addEventListener('submit', (event) => {
   // Create FormData object from the form
   const formData = new FormData(event.target);
   
+  // Add the authenticated password to the form data
+  if (userPassword) {
+    formData.append('password', userPassword);
+  } else {
+    updateStatusMessage('Authentication error. Please refresh and try again.', 'error');
+    const spinner = document.querySelector('.loading-spinner');
+    submitButton.disabled = false;
+    submitButton.style.display = 'block';
+    spinner.style.display = 'none';
+    return;
+  }
+  
   // Fetch to the Cloudflare Worker (actual deployed URL)
   fetch('https://tele-clipper-worker.poxmaadani.workers.dev', {
     method: 'POST',
@@ -122,6 +249,14 @@ form.addEventListener('submit', (event) => {
   .then(response => {
     if (response.ok) {
       return response.json();
+    } else if (response.status === 401) {
+      // Authentication failed - clear session and show password overlay
+      sessionStorage.removeItem('teleClipperAuth');
+      sessionStorage.removeItem('teleClipperPassword');
+      userPassword = '';
+      passwordOverlay.classList.remove('hidden');
+      passwordInput.focus();
+      throw new Error('Authentication failed. Please enter your password again.');
     } else {
       return response.json().then(data => {
         throw new Error(data.error || 'Server error');
