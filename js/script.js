@@ -34,51 +34,20 @@ passwordForm.addEventListener('submit', async (event) => {
   passwordSubmit.disabled = true;
   passwordSubmit.textContent = '🔄 Verifying...';
   
-  try {
-    // Test password by making a dummy request to the backend
-    const testFormData = new FormData();
-    testFormData.append('password', enteredPassword);
-    testFormData.append('note', 'auth_test'); // Minimal test data
-    
-    const response = await fetch('https://tele-clipper-worker.poxmaadani.workers.dev', {
-      method: 'POST',
-      body: testFormData
-    });
-    
-    const result = await response.json();
-    
-    if (response.ok && result.success) {
-      // Correct password
-      userPassword = enteredPassword;
-      sessionStorage.setItem('teleClipperAuth', 'true');
-      sessionStorage.setItem('teleClipperPassword', enteredPassword);
-      
-      passwordOverlay.style.animation = 'fadeOut 0.5s ease-out forwards';
-      
-      setTimeout(() => {
-        passwordOverlay.classList.add('hidden');
-      }, 500);
-      
-      passwordError.textContent = '';
-      passwordInput.classList.remove('error');
-    } else {
-      // Wrong password
-      passwordError.textContent = '❌ Incorrect password. Try again.';
-      passwordInput.classList.add('error');
-      passwordInput.value = '';
-      passwordInput.focus();
-      
-      // Remove error styling after 2 seconds
-      setTimeout(() => {
-        passwordInput.classList.remove('error');
-        passwordError.textContent = '';
-      }, 2000);
-    }
-  } catch (error) {
-    console.error('Password verification error:', error);
-    passwordError.textContent = '❌ Network error. Please try again.';
-    passwordInput.classList.add('error');
-  }
+  // Simply store the password and unlock without server verification
+  // The password will be verified on actual form submission
+  userPassword = enteredPassword;
+  sessionStorage.setItem('teleClipperAuth', 'true');
+  sessionStorage.setItem('teleClipperPassword', enteredPassword);
+  
+  passwordOverlay.style.animation = 'fadeOut 0.5s ease-out forwards';
+  
+  setTimeout(() => {
+    passwordOverlay.classList.add('hidden');
+  }, 500);
+  
+  passwordError.textContent = '';
+  passwordInput.classList.remove('error');
   
   // Reset button state
   passwordSubmit.disabled = false;
